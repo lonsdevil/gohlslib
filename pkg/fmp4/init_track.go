@@ -1,6 +1,8 @@
 package fmp4
 
 import (
+	"fmt"
+
 	gomp4 "github.com/abema/go-mp4"
 
 	"github.com/bluenviron/mediacommon/pkg/codecs/h264"
@@ -123,6 +125,8 @@ func (track *InitTrack) marshal(w *mp4Writer) error {
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("TS", track.TimeScale)
 
 	_, err = w.writeBox(&gomp4.Mdhd{ // <mdhd/>
 		Timescale: track.TimeScale,
@@ -381,34 +385,33 @@ func (track *InitTrack) marshal(w *mp4Writer) error {
 			return err
 		}
 
-		enc, _ := tcodec.Config.Marshal()
+		// enc, _ := tcodec.Config.Marshal()
 
 		_, err = w.writeBox(&gomp4.Esds{ // <esds/>
 			Descriptors: []gomp4.Descriptor{
 				{
 					Tag:  gomp4.ESDescrTag,
-					Size: 32 + uint32(len(enc)),
+					Size: 27, // + uint32(len(enc)),
 					ESDescriptor: &gomp4.ESDescriptor{
 						ESID: uint16(track.ID),
 					},
 				},
 				{
 					Tag:  gomp4.DecoderConfigDescrTag,
-					Size: 18 + uint32(len(enc)),
+					Size: 13, // + uint32(len(enc)),
 					DecoderConfigDescriptor: &gomp4.DecoderConfigDescriptor{
-						ObjectTypeIndication: 0x40,
-						StreamType:           0x05,
-						UpStream:             false,
+						ObjectTypeIndication: 107,
+						StreamType:           5,
 						Reserved:             true,
 						MaxBitrate:           128825,
 						AvgBitrate:           128825,
 					},
 				},
-				{
+				/*{
 					Tag:  gomp4.DecSpecificInfoTag,
 					Size: uint32(len(enc)),
 					Data: enc,
-				},
+				},*/
 				{
 					Tag:  gomp4.SLConfigDescrTag,
 					Size: 1,

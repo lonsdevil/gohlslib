@@ -65,7 +65,8 @@ func (pt *PartTrack) marshal(w *mp4Writer) (*gomp4.Trun, int, error) {
 	} else {
 		flags = trunFlagDataOffsetPreset |
 			trunFlagSampleDurationPresent |
-			trunFlagSampleSizePresent
+			trunFlagSampleSizePresent |
+			trunFlagSampleFlagsPresent
 	}
 
 	trun := &gomp4.Trun{ // <trun/>
@@ -93,6 +94,7 @@ func (pt *PartTrack) marshal(w *mp4Writer) (*gomp4.Trun, int, error) {
 			trun.Entries = append(trun.Entries, gomp4.TrunEntry{
 				SampleDuration: sample.Duration,
 				SampleSize:     uint32(len(sample.Payload)),
+				SampleFlags:    33554432,
 			})
 		}
 	}
